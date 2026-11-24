@@ -238,6 +238,12 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
     <section class="card glance" id="glance" hidden></section>
 
     <section class="card pink">
+      <div class="card-h"><h2><span class="ic" data-ic="paw"></span>Stool tracker</h2></div>
+      <p class="muted">Record each bowel movement to help spot changes. This is a log, not a diagnosis.</p>
+      <form id="stoolForm"><fieldset><label>When<input type="datetime-local" id="sTime" required></label><div class="row2"><label>Consistency<select id="sConsistency" required><option value="Formed">Formed</option><option value="Soft">Soft</option><option value="Loose">Loose</option><option value="Watery">Watery</option><option value="Hard / dry">Hard / dry</option></select></label><label>Colour<select id="sColor" required><option value="Brown">Brown</option><option value="Dark brown">Dark brown</option><option value="Yellow">Yellow</option><option value="Green">Green</option><option value="Black">Black</option><option value="Red / blood">Red / blood</option><option value="Pale">Pale</option></select></label></div><label>Note (optional)<input id="sNote" maxlength="140" placeholder="e.g. straining, mucus"></label><button class="btn" type="submit">Save stool record</button></fieldset></form><div id="stoolList"></div>
+    </section>
+
+    <section class="card pink">
       <div class="card-h"><h2><span class="ic" data-ic="bowl"></span>Log a meal</h2></div>
       <form id="feedForm">
         <fieldset id="feedFs">
@@ -291,11 +297,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
       <div id="weightList"></div>
     </section>
 
-    <section class="card pink">
-      <div class="card-h"><h2><span class="ic" data-ic="paw"></span>Stool tracker</h2></div>
-      <p class="muted">Record each bowel movement to help spot changes. This is a log, not a diagnosis.</p>
-      <form id="stoolForm"><fieldset><label>When<input type="datetime-local" id="sTime" required></label><div class="row2"><label>Consistency<select id="sConsistency" required><option value="Formed">Formed</option><option value="Soft">Soft</option><option value="Loose">Loose</option><option value="Watery">Watery</option><option value="Hard / dry">Hard / dry</option></select></label><label>Colour<select id="sColor" required><option value="Brown">Brown</option><option value="Dark brown">Dark brown</option><option value="Yellow">Yellow</option><option value="Green">Green</option><option value="Black">Black</option><option value="Red / blood">Red / blood</option><option value="Pale">Pale</option></select></label></div><label>Note (optional)<input id="sNote" maxlength="140" placeholder="e.g. straining, mucus"></label><button class="btn" type="submit">Save stool record</button></fieldset></form><div id="stoolList"></div>
-    </section>
+
 
     <section class="card">
       <div class="card-h"><h2><span class="ic" data-ic="note"></span>Health notes</h2></div>
