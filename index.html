@@ -280,6 +280,49 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:3px s
   #stoolCard .row2{grid-template-columns:1fr}
   .tab{font-size:10px}
 }
+
+/* Daily care dashboard */
+.daily-board,.quick-board,.activity-board{background:var(--surface);border:1px solid var(--line)}
+.daily-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.daily-head h2{font-size:21px;margin-top:2px}
+.daily-head .muted{font-size:13px;margin-top:3px}
+.daily-score{min-width:76px;text-align:center;background:var(--accent-soft);color:var(--accent-text);padding:10px 12px;border-radius:16px}
+.daily-score strong{display:block;font-size:23px;line-height:1.1}
+.daily-score span{font-size:11px;font-weight:600}
+.daily-progress{height:9px;background:var(--bg);border-radius:99px;overflow:hidden;margin-top:16px}
+.daily-progress i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .2s ease}
+.daily-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:14px}
+.daily-check{display:flex;align-items:center;gap:9px;min-width:0;padding:11px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.daily-check .dc-icon{width:34px;height:34px;display:grid;place-items:center;background:var(--surface);border-radius:11px;font-size:18px;flex:none}
+.daily-check b{display:block;font-size:13px;line-height:1.25}
+.daily-check small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.daily-check.done{border-color:#b9dfc9;background:var(--ok-soft)}
+.daily-check.done .dc-icon{background:var(--surface)}
+.daily-note{font-size:12px;color:var(--muted);margin-top:12px}
+.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.quick-action{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:16px;min-height:112px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s}
+.quick-action:active{transform:scale(.97)}
+.quick-action:hover{border-color:var(--accent)}
+.quick-action .qa-icon{font-size:24px;line-height:1.25}
+.quick-action b{font-size:12px;line-height:1.3}
+.quick-action small{font-size:10px;color:var(--muted);line-height:1.25}
+.activity-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.activity-row:first-child{border-top:0}
+.activity-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:12px;background:var(--accent-soft);font-size:17px}
+.activity-main{min-width:0}
+.activity-main b{font-size:13px;display:block;overflow-wrap:anywhere}
+.activity-main small{font-size:11px;color:var(--muted);display:block}
+.activity-time{font-size:11px;color:var(--muted);white-space:nowrap}
+@media(min-width:760px){
+ #v-feed #dailyBoard,#v-feed .quick-board,#v-feed .activity-board{grid-column:1/-1}
+ #v-feed .quick-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+}
+@media(max-width:430px){
+ .daily-checks{grid-template-columns:1fr 1fr}
+ .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .quick-action{min-height:100px}
+ .daily-head h2{font-size:19px}
+}
 </style>
 </head>
 <body>
@@ -303,6 +346,33 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:3px s
   <!-- FEEDING -->
   <main class="view" id="v-feed">
     <section class="hero" id="next" aria-live="polite"></section>
+
+    <section class="card daily-board" id="dailyBoard" aria-labelledby="dailyTitle">
+      <div class="daily-head"><div><p class="k">Mio's routine</p><h2 id="dailyTitle">Today's care</h2><p class="muted" id="dailyDate"></p></div><div class="daily-score"><strong id="dailyCount">0/4</strong><span>care steps</span></div></div>
+      <div class="daily-progress"><i id="dailyBar"></i></div>
+      <div class="daily-checks" id="dailyChecks" aria-live="polite"></div>
+      <p class="daily-note">A simple daily overview. Stool entries are tracked separately and are not counted as a routine task.</p>
+    </section>
+
+    <section class="card quick-board" aria-labelledby="quickTitle">
+      <div class="card-h"><h2 id="quickTitle">Quick actions</h2><span class="st later">One tap</span></div>
+      <p class="muted">Choose what you just did for Mio. Both caregivers will see the update.</p>
+      <div class="quick-grid">
+        <button class="quick-action qa-meal" type="button" data-act="quick" data-v="meal"><span class="qa-icon">🥣</span><b>Fed Mio</b><small>Log a meal</small></button>
+        <button class="quick-action qa-water" type="button" data-act="quick" data-v="water"><span class="qa-icon">💧</span><b>Fresh water</b><small>Changed water</small></button>
+        <button class="quick-action qa-groom" type="button" data-act="quick" data-v="groom"><span class="qa-icon">🪮</span><b>Brushed coat</b><small>Grooming done</small></button>
+        <button class="quick-action qa-eyes" type="button" data-act="quick" data-v="eyes"><span class="qa-icon">🐾</span><b>Cleaned eyes</b><small>Gentle eye care</small></button>
+        <button class="quick-action qa-drink" type="button" data-act="quick" data-v="drink"><span class="qa-icon">🐱</span><b>Saw Mio drink</b><small>Water intake</small></button>
+        <button class="quick-action qa-stool" type="button" data-act="quick" data-v="stool"><span class="qa-icon">📝</span><b>Log stool</b><small>Open stool form</small></button>
+      </div>
+      <p class="daily-note" id="quickCaregiver"></p>
+    </section>
+
+    <section class="card activity-board">
+      <div class="card-h"><h2>Recent activity</h2><span class="st later">Shared log</span></div>
+      <p class="muted">Latest updates from you and your sister.</p>
+      <div id="recentActivity" aria-live="polite"></div>
+    </section>
     <section class="card glance" id="glance" hidden></section>
 
     <section class="card pink" id="stoolCard">
