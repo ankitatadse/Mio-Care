@@ -399,6 +399,33 @@ input[type="datetime-local"]::-webkit-datetime-edit{
   input[type="date"],input[type="datetime-local"]{padding-inline:8px;font-size:15px}
 }
 
+
+/* Simplified dashboard and consistent responsive controls */
+.more-logs{grid-column:1/-1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:0 16px 16px;box-shadow:var(--shadow)}
+.more-logs>summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:16px 2px;font-weight:600;color:var(--ink);min-height:64px;justify-content:center}
+.more-logs>summary::-webkit-details-marker{display:none}
+.more-logs>summary:after{content:"＋";position:absolute;right:24px;color:var(--accent-text);font-size:20px}
+.more-logs[open]>summary:after{content:"−"}
+.more-logs>summary small{font-weight:400;color:var(--muted);font-size:12px}
+.more-logs #stoolCard,.more-logs #feedCard,.more-logs #feedHistory{margin-top:12px;box-shadow:none}
+.quick-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.quick-action{min-height:96px;padding:14px 8px;border-radius:18px}
+.quick-action b{font-size:13px}
+.quick-action small{font-size:11px}
+.btn,.x,.chip,.tab{touch-action:manipulation}
+.btn{min-height:50px;padding:12px 18px;border-radius:14px}
+@media(max-width:760px){
+  .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .quick-action{min-height:88px}
+  #v-feed{grid-template-columns:minmax(0,1fr)}
+  #v-feed>*{grid-column:1/-1;min-width:0}
+  .more-logs{padding-inline:13px}
+}
+@media(min-width:761px){
+  .quick-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .more-logs{padding-inline:18px}
+}
+
 </style>
 </head>
 <body>
@@ -438,7 +465,6 @@ input[type="datetime-local"]::-webkit-datetime-edit{
         <button class="quick-action qa-water" type="button" data-act="quick" data-v="water"><span class="qa-icon">💧</span><b>Fresh water</b><small>Changed water</small></button>
         <button class="quick-action qa-groom" type="button" data-act="quick" data-v="groom"><span class="qa-icon">🪮</span><b>Brushed coat</b><small>Grooming done</small></button>
         <button class="quick-action qa-eyes" type="button" data-act="quick" data-v="eyes"><span class="qa-icon">🐾</span><b>Cleaned eyes</b><small>Gentle eye care</small></button>
-        <button class="quick-action qa-drink" type="button" data-act="quick" data-v="drink"><span class="qa-icon">🐱</span><b>Saw Mio drink</b><small>Water intake</small></button>
         <button class="quick-action qa-stool" type="button" data-act="quick" data-v="stool"><span class="qa-icon">📝</span><b>Log stool</b><small>Open stool form</small></button>
       </div>
       <p class="daily-note" id="quickCaregiver"></p>
@@ -451,6 +477,8 @@ input[type="datetime-local"]::-webkit-datetime-edit{
     </section>
     <section class="card glance" id="glance" hidden></section>
 
+    <details class="more-logs">
+      <summary><span>More logging options</span><small>Detailed meal and stool records</small></summary>
     <section class="card pink" id="stoolCard">
       <div class="card-h"><h2><span class="ic" data-ic="paw"></span>Stool tracker</h2><span class="st later">Quick log</span></div>
       <p class="muted">Record each bowel movement to help spot changes. This is a log, not a diagnosis.</p>
@@ -482,6 +510,7 @@ input[type="datetime-local"]::-webkit-datetime-edit{
       <div class="chips" id="todaySum"></div>
       <div id="feedList"></div>
     </section>
+    </details>
   </main>
 
   <!-- HEALTH -->
