@@ -323,6 +323,49 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:3px s
  .quick-action{min-height:100px}
  .daily-head h2{font-size:19px}
 }
+
+/* Form control theme + native date/time sizing fixes */
+:root{--control-bg:#fffaf7;--control-ink:#231d3d;--control-border:#e7dced;--control-placeholder:#817992}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--control-bg:#211b35;--control-ink:#f3eefc;--control-border:#51476e;--control-placeholder:#b2a9cf}
+}
+:root[data-theme="dark"]{--control-bg:#211b35;--control-ink:#f3eefc;--control-border:#51476e;--control-placeholder:#b2a9cf}
+:root[data-theme="light"]{--control-bg:#fffaf7;--control-ink:#231d3d;--control-border:#e7dced;--control-placeholder:#817992}
+input,select,textarea{
+  color:var(--control-ink)!important;
+  background-color:var(--control-bg)!important;
+  border:1px solid var(--control-border)!important;
+  color-scheme:inherit;
+  max-width:100%;
+}
+input::placeholder,textarea::placeholder{color:var(--control-placeholder)!important;opacity:1}
+input[type="date"],input[type="datetime-local"],input[type="time"]{
+  display:block;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  min-height:48px;
+  padding:10px 11px;
+  font:inherit;
+  font-size:16px;
+  line-height:1.25;
+  border-radius:12px;
+  appearance:auto;
+  -webkit-appearance:auto;
+}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="datetime-local"]::-webkit-date-and-time-value{
+  text-align:left;
+  min-height:1.25em;
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator{
+  opacity:.85;
+  cursor:pointer;
+}
+label{min-width:0}
+fieldset,.row2,form{min-width:0}
+
 </style>
 </head>
 <body>
