@@ -366,6 +366,39 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{
 label{min-width:0}
 fieldset,.row2,form{min-width:0}
 
+
+/* Health form layout: prevent labels and native date controls colliding */
+#v-health,#v-health .card,#v-health form,#v-health fieldset,
+#v-health .row2,#v-health label{min-width:0;max-width:100%}
+#noteForm .row2{grid-template-columns:minmax(0,1fr)}
+#noteForm label{width:100%;min-width:0}
+#noteForm input{display:block;width:100%;min-width:0;max-width:100%}
+input[type="date"],input[type="datetime-local"],input[type="time"]{
+  box-sizing:border-box;
+  inline-size:100%;
+  min-inline-size:0;
+  max-inline-size:100%;
+  overflow:hidden;
+  padding-inline:10px;
+  font-size:16px;
+}
+input[type="date"]::-webkit-datetime-edit,
+input[type="datetime-local"]::-webkit-datetime-edit{
+  min-width:0;
+  padding:0;
+}
+@media(max-width:759px){
+  #v-health{grid-template-columns:minmax(0,1fr)}
+  #v-health .row2{grid-template-columns:minmax(0,1fr)}
+  #v-health .card{height:auto}
+  #v-health input[type="date"],
+  #v-health input[type="datetime-local"]{width:100%;max-width:100%}
+}
+@media(max-width:380px){
+  .card{padding:15px}
+  input[type="date"],input[type="datetime-local"]{padding-inline:8px;font-size:15px}
+}
+
 </style>
 </head>
 <body>
