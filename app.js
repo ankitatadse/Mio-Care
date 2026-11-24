@@ -351,7 +351,34 @@ function fillProfile() {
   $("#pDob").value = p.dob || ""; $("#pC1").value = (p.caretakers && p.caretakers[0]) || ""; $("#pC2").value = (p.caretakers && p.caretakers[1]) || "";
   $("#pGap").value = p.gapHours || 4;
 }
-function renderAll() { renderBanner(); renderHeader(); renderChips(); renderNext(); renderCare(); renderFeedList(); renderHealth(); }
+
+function routineLogs() { return of("routine").sort(function(a,b){return b.ts-a.ts;}); }
+function renderDaily() {
+  var today=ymd(new Date()), mealRows=feeds().filter(function(x){return sameDay(new Date(x.ts),new Date()) && x.meal!==false;});
+  var stoolRows=stools().filter(function(x){return sameDay(new Date(x.ts),new Date());});
+  var logs=routineLogs().filter(function(x){return sameDay(new Date(x.ts),new Date());});
+  var has=function(task){return logs.some(function(x){return x.task===task;});};
+  var tasks=[
+    {key:"meal",icon:"🥣",name:"Feeding logged",hint:mealRows.length?mealRows.length+" meal"+(mealRows.length===1?"":"s")+" logged":"No meals logged yet",done:mealRows.length>0},
+    {key:"water",icon:"💧",name:"Fresh water",hint:has("water")?"Water refreshed":"Not logged yet",done:has("water")},
+    {key:"groom",icon:"🪮",name:"Coat brushed",hint:has("groom")?"Grooming logged":"Not logged yet",done:has("groom")},
+    {key:"eyes",icon:"🐾",name:"Eyes cleaned",hint:has("eyes")?"Eye care logged":"Not logged yet",done:has("eyes")}
+  ];
+  var done=tasks.filter(function(t){return t.done;}).length;
+  $("#dailyDate").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"});
+  $("#dailyCount").textContent=done+"/4";
+  $("#dailyBar").style.width=(done/4*100)+"%";
+  $("#dailyChecks").innerHTML=tasks.map(function(t){return '<div class="daily-check '+(t.done?"done":"")+'"><span class="dc-icon">'+t.icon+'</span><span><b>'+esc(t.name)+'</b><small>'+esc(t.hint)+'</small></span></div>';}).join("");
+  $("#quickCaregiver").textContent="Logging as "+(S.who||names()[0])+". Change caregiver using the chips in Log a meal.";
+  var all=[];
+  feeds().forEach(function(x){all.push({ts:x.ts,icon:"🥣",title:"Meal: "+(x.food||"Food")+(x.amount?" · "+x.amount:""),by:x.by||"Caregiver"});});
+  stools().forEach(function(x){all.push({ts:x.ts,icon:"📝",title:"Stool: "+(x.consistency||"")+" · "+(x.color||""),by:x.by||"Caregiver"});});
+  routineLogs().forEach(function(x){var labels={water:"Fresh water changed",drink:"Saw Mio drinking water",groom:"Coat brushed",eyes:"Eyes gently cleaned"};all.push({ts:x.ts,icon:({water:"💧",drink:"🐱",groom:"🪮",eyes:"🐾"})[x.task]||"🐾",title:labels[x.task]||"Care updated",by:x.by||"Caregiver"});});
+  weights().forEach(function(x){var d=parseYmd(x.date);all.push({ts:d?d.getTime():0,icon:"⚖️",title:"Weight recorded: "+x.kg+" kg",by:"Caregiver"});});
+  all.sort(function(a,b){return b.ts-a.ts;});
+  $("#recentActivity").innerHTML=all.length?all.slice(0,8).map(function(x){return '<div class="activity-row"><span class="activity-icon">'+x.icon+'</span><span class="activity-main"><b>'+esc(x.title)+'</b><small>By '+esc(x.by)+' · '+esc(dayLabel(x.ts))+'</small></span><span class="activity-time">'+esc(fmtTime(x.ts))+'</span></div>';}).join(""):'<p class="empty">No activity yet. Use a quick action to start Mio’s shared daily log.</p>';
+}
+function renderAll() { renderDaily(); renderBanner(); renderHeader(); renderChips(); renderNext(); renderCare(); renderFeedList(); renderHealth(); }
 
 /* ================= tabs ================= */
 function setTab() {
@@ -359,6 +386,7 @@ function setTab() {
   TABS.forEach(function (t) { $("#v-" + t).hidden = t !== S.tab; });
   $$(".tab").forEach(function (a) { if (a.dataset.tab === S.tab) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   if (S.tab === "feed" && !S.feedDirty) $("#fTime").value = nowInput();
+  if (S.tab === "feed" && !$("#sTime").value) $("#sTime").value = nowInput();
   if (S.tab === "health") { if (!$("#sTime").value) $("#sTime").value = nowInput(); if (!$("#wDate").value) $("#wDate").value = ymd(new Date()); if (!$("#nDate").value) $("#nDate").value = ymd(new Date()); }
   window.scrollTo(0, 0);
 }
@@ -368,7 +396,19 @@ window.addEventListener("hashchange", setTab);
 document.addEventListener("click", function (e) {
   var b = e.target.closest("[data-act]"); if (!b) return;
   var a = b.dataset.act, v = b.dataset.v;
-  if (a === "food") { S.food = v; renderChips(); renderNext(); }
+
+  if (a === "quick") {
+    if (v === "stool") { $("#sTime").value=nowInput(); $("#stoolCard").scrollIntoView({behavior:"smooth",block:"start"}); $("#sConsistency").focus({preventScroll:true}); return; }
+    if (v === "meal") {
+      var isMeal=FOODS.filter(function(f){return f[0]===S.food;})[0][1]===1;
+      save({id:uid(),kind:"feed",data:{ts:Date.now(),food:S.food,amount:"",by:S.who||names()[0],note:"",meal:isMeal}},"Meal logged");
+      return;
+    }
+    var task=v;
+    var messages={water:"Fresh water logged",drink:"Water intake logged",groom:"Grooming logged",eyes:"Eye care logged"};
+    save({id:uid(),kind:"routine",data:{ts:Date.now(),task:task,by:S.who||names()[0]}} ,messages[task]||"Care logged");
+  }
+  else if (a === "food") { S.food = v; renderChips(); renderNext(); }
   else if (a === "who") { S.who = v; try { localStorage.setItem("kitten-who", v); } catch (_) {} renderChips(); renderNext(); renderHeader(); }
   else if (a === "fednow") {
     var meal = FOODS.filter(function (f) { return f[0] === S.food; })[0][1] === 1;
