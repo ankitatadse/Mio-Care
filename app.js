@@ -318,7 +318,8 @@ function renderStools() {
     return '<div class="item"><span class="ibub lilac">' + ic("paw") + '</span><div class="what"><b class="t">' + esc(fmtDate(new Date(x.ts))) + ' · ' + esc(fmtTime(x.ts)) + '</b><small>' + esc(x.consistency) + ' · ' + esc(x.color) + (x.note ? ' · ' + esc(x.note) : '') + '</small><small>Logged by ' + esc(x.by || "Caregiver") + '</small></div><button class="x" data-act="del" data-v="' + esc(x.id) + '" aria-label="Delete stool record">' + ic("trash") + '</button>' + delBlock(x.id) + '</div>';
   }).join("");
 }
-\nfunction chart(pts) {
+
+function chart(pts) {
   var W = 340, H = 170, L = 40, R = 16, T = 26, B = 28;
   var xs = pts.map(function (p) { return (parseYmd(p.date) || new Date()).getTime(); });
   var ys = pts.map(function (p) { return +p.kg; });
@@ -403,7 +404,8 @@ $("#stoolForm").addEventListener("submit", function (e) {
   var rec = { id: uid(), kind: "stool", data: { ts: ts, consistency: $("#sConsistency").value, color: $("#sColor").value, note: $("#sNote").value.trim(), by: S.who || names()[0] } };
   save(rec, "Stool record saved").then(function (ok) { if (ok) { $("#sNote").value = ""; $("#sTime").value = nowInput(); } });
 });
-\n$("#weightForm").addEventListener("submit", function (e) {
+
+$("#weightForm").addEventListener("submit", function (e) {
   e.preventDefault();
   var kg = parseFloat($("#wKg").value), d = $("#wDate").value;
   if (!(kg > 0) || !parseYmd(d)) { toast("Enter a valid weight and date", true); return; }
