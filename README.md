@@ -23,3 +23,4 @@ A small mobile web app for you and your sister to log your Persian kitten's meal
 - Data refreshes every 15 seconds and whenever you reopen the app.
 - Anyone who has your site link can view and edit the data. Keep the link private. Do not add personal information beyond the kitten's details.
 - Vaccine and deworming dates follow a common kitten schedule. Confirm with your vet.
+# Mio-Care
