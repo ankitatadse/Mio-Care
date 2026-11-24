@@ -74,7 +74,7 @@ var store = {
       .then(function (r) { if (!r.ok) throw new Error("delete " + r.status); });
   }
 };
-function sbHeaders() { return { apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey }; }
+function sbHeaders() { return { apikey: CFG.supabaseKey, Authorization: "Bearer " + (window.MIO_AUTH_TOKEN || CFG.supabaseKey) }; }
 function localLoad() { try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch (e) { return []; } }
 function localSave(a) { try { localStorage.setItem(LS_KEY, JSON.stringify(a)); return Promise.resolve(); } catch (e) { return Promise.reject(e); } }
 
@@ -91,6 +91,7 @@ function of(kind) { return S.recs.filter(function (r) { return r.kind === kind; 
 function profile() { var p = S.recs.filter(function (r) { return r.id === "profile"; })[0]; return p ? p.data : null; }
 function feeds() { return of("feed").sort(function (a, b) { return b.ts - a.ts; }); }
 function weights() { return of("weight").sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; }); }
+function stools() { return of("stool").sort(function (a, b) { return b.ts - a.ts; }); }
 function notes() { return of("note").sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; }); }
 function careMap() { var m = {}; of("care").forEach(function (o) { m[o.id] = o; }); return m; }
 
@@ -283,6 +284,7 @@ function renderFeedList() {
 
 /* ---- health ---- */
 function renderHealth() {
+  renderStools();
   var p = profile(), a = p && p.dob ? age(p.dob) : null, W = weights(), w = W[0];
   $("#ageCard").innerHTML = '<p class="k">About ' + esc((p && p.name) || "your kitten") + '</p>'
     + '<p class="agebig">' + (a ? esc(ageText(a)) : "Add birth date") + '</p>'
@@ -306,7 +308,17 @@ function renderHealth() {
       + '<button class="x" data-act="del" data-v="' + esc(x.id) + '" aria-label="Delete note">' + ic("trash") + '</button>' + delBlock(x.id) + '</div>';
   }).join("");
 }
-function chart(pts) {
+
+function renderStools() {
+  var el = $("#stoolList"), all = stools();
+  if (!el) return;
+  if (!S.loaded) { el.innerHTML = '<p class="empty">Loading…</p>'; return; }
+  if (!all.length) { el.innerHTML = '<p class="empty">No stool records yet.</p>'; return; }
+  el.innerHTML = all.slice(0, 20).map(function (x) {
+    return '<div class="item"><span class="ibub lilac">' + ic("paw") + '</span><div class="what"><b class="t">' + esc(fmtDate(new Date(x.ts))) + ' · ' + esc(fmtTime(x.ts)) + '</b><small>' + esc(x.consistency) + ' · ' + esc(x.color) + (x.note ? ' · ' + esc(x.note) : '') + '</small><small>Logged by ' + esc(x.by || "Caregiver") + '</small></div><button class="x" data-act="del" data-v="' + esc(x.id) + '" aria-label="Delete stool record">' + ic("trash") + '</button>' + delBlock(x.id) + '</div>';
+  }).join("");
+}
+\nfunction chart(pts) {
   var W = 340, H = 170, L = 40, R = 16, T = 26, B = 28;
   var xs = pts.map(function (p) { return (parseYmd(p.date) || new Date()).getTime(); });
   var ys = pts.map(function (p) { return +p.kg; });
@@ -346,7 +358,7 @@ function setTab() {
   TABS.forEach(function (t) { $("#v-" + t).hidden = t !== S.tab; });
   $$(".tab").forEach(function (a) { if (a.dataset.tab === S.tab) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   if (S.tab === "feed" && !S.feedDirty) $("#fTime").value = nowInput();
-  if (S.tab === "health") { if (!$("#wDate").value) $("#wDate").value = ymd(new Date()); if (!$("#nDate").value) $("#nDate").value = ymd(new Date()); }
+  if (S.tab === "health") { if (!$("#sTime").value) $("#sTime").value = nowInput(); if (!$("#wDate").value) $("#wDate").value = ymd(new Date()); if (!$("#nDate").value) $("#nDate").value = ymd(new Date()); }
   window.scrollTo(0, 0);
 }
 window.addEventListener("hashchange", setTab);
@@ -383,7 +395,15 @@ $("#feedForm").addEventListener("submit", function (e) {
   var rec = { id: uid(), kind: "feed", data: { ts: ts, food: S.food, amount: $("#fAmount").value.trim(), by: S.who || names()[0], note: $("#fNote").value.trim(), meal: meal } };
   save(rec, "Meal saved").then(function (ok) { if (ok) { $("#fAmount").value = ""; $("#fNote").value = ""; S.feedDirty = false; $("#fTime").value = nowInput(); } });
 });
-$("#weightForm").addEventListener("submit", function (e) {
+
+$("#stoolForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  var ts = new Date($("#sTime").value).getTime();
+  if (!isFinite(ts) || ts > Date.now()) { toast("Enter a valid past date and time", true); return; }
+  var rec = { id: uid(), kind: "stool", data: { ts: ts, consistency: $("#sConsistency").value, color: $("#sColor").value, note: $("#sNote").value.trim(), by: S.who || names()[0] } };
+  save(rec, "Stool record saved").then(function (ok) { if (ok) { $("#sNote").value = ""; $("#sTime").value = nowInput(); } });
+});
+\n$("#weightForm").addEventListener("submit", function (e) {
   e.preventDefault();
   var kg = parseFloat($("#wKg").value), d = $("#wDate").value;
   if (!(kg > 0) || !parseYmd(d)) { toast("Enter a valid weight and date", true); return; }
@@ -411,8 +431,8 @@ function refresh() {
     S.recs = rows; S.loaded = true; S.loadError = false; fillProfile(); renderAll();
   }, function () { S.loadError = true; renderBanner(); });
 }
-hydrateIcons(); setTab(); renderAll(); refresh();
-setInterval(refresh, 15000);
+hydrateIcons(); setTab(); renderAll();
+Promise.resolve(window.MIO_AUTH_READY).then(function () { $("#appShell").hidden = false; $("#loginPanel").hidden = true; refresh(); setInterval(refresh, 15000); }).catch(function (e) { console.error(e); });
 setInterval(function () { renderNext(); renderHeader(); }, 30000);
 document.addEventListener("visibilitychange", function () { if (!document.hidden) refresh(); });
 })();
