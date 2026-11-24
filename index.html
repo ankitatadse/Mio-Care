@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffd9b3">
+<meta name="theme-color" content="#f8f2e9">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Kitten Diary">
 <title>Kitten Care Diary</title>
@@ -13,7 +16,7 @@
 <style>
 /* Layout: peach page, soft rounded cards, periwinkle hero with a paw watermark, floating pill tab bar with icons. */
 :root{
-  --bg:#ffd9b3; --surface:#fffaf7; --ink:#231d3d; --muted:#7a7390; --line:#f1e2d6;
+  --bg:#f8f2e9; --surface:#fffaf7; --ink:#231d3d; --muted:#7a7390; --line:#f1e2d6;
   --accent:#8e86e4; --accent-ink:#ffffff; --accent-soft:#e6e3fb; --accent-text:#5a50c8;
   --orange:#f2a93b; --orange-soft:#fbe3bd; --orange-text:#9a5b00;
   --pink:#fdeef0; --lilac:#e6c8fa; --lilac-text:#6a3f94; --peach:#f6cfa3; --peach-text:#8a4f12;
@@ -215,7 +218,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 <span class="bgpaw ic fill" data-ic="paw" aria-hidden="true"></span>
 <span class="bgpaw two ic fill" data-ic="paw" aria-hidden="true"></span>
 
-<div class="wrap">
+<section id="loginPanel" class="card" style="max-width:440px;margin:10vh auto;position:relative;z-index:5" hidden><h1>MioCare 🐾</h1><p class="muted">Sign in with your caregiver account.</p><form id="loginForm"><label>Email<input id="loginEmail" type="email" autocomplete="username" required></label><label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label><button class="btn" type="submit">Sign in</button><p id="loginError" class="muted" role="alert"></p></form></section>
+<div class="wrap" id="appShell" hidden>
   <header class="top">
     <div class="avatar"><span class="ic fill" data-ic="paw"></span></div>
     <div class="who">
@@ -285,6 +289,12 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
       <div class="card-h"><h2><span class="ic" data-ic="chart"></span>Weight chart</h2><span class="muted">kg</span></div>
       <div id="weightChart"></div>
       <div id="weightList"></div>
+    </section>
+
+    <section class="card pink">
+      <div class="card-h"><h2><span class="ic" data-ic="paw"></span>Stool tracker</h2></div>
+      <p class="muted">Record each bowel movement to help spot changes. This is a log, not a diagnosis.</p>
+      <form id="stoolForm"><fieldset><label>When<input type="datetime-local" id="sTime" required></label><div class="row2"><label>Consistency<select id="sConsistency" required><option value="Formed">Formed</option><option value="Soft">Soft</option><option value="Loose">Loose</option><option value="Watery">Watery</option><option value="Hard / dry">Hard / dry</option></select></label><label>Colour<select id="sColor" required><option value="Brown">Brown</option><option value="Dark brown">Dark brown</option><option value="Yellow">Yellow</option><option value="Green">Green</option><option value="Black">Black</option><option value="Red / blood">Red / blood</option><option value="Pale">Pale</option></select></label></div><label>Note (optional)<input id="sNote" maxlength="140" placeholder="e.g. straining, mucus"></label><button class="btn" type="submit">Save stool record</button></fieldset></form><div id="stoolList"></div>
     </section>
 
     <section class="card">
@@ -373,6 +383,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
 <script src="app.js"></script>
+<script>if ("serviceWorker" in navigator) window.addEventListener("load", function(){navigator.serviceWorker.register("./service-worker.js").catch(function(e){console.warn("PWA service worker:",e);});});</script>
 </body>
 </html>
