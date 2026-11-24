@@ -470,6 +470,67 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   }
 }
 
+
+/* Mobile Safari/Chrome: constrain native date controls inside grid labels */
+@media screen and (max-width:600px){
+  #v-feed,#v-health,#v-care,#v-profile,
+  #v-feed .card,#v-health .card,#v-care .card,#v-profile .card,
+  #feedForm,#stoolForm,#weightForm,#noteForm,#profileForm,
+  #feedForm fieldset,#stoolForm fieldset,#weightForm fieldset,#noteForm fieldset,#profileForm fieldset,
+  #feedForm label,#stoolForm label,#weightForm label,#noteForm label,#profileForm label{
+    width:100%;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  #feedForm fieldset,#stoolForm fieldset,#weightForm fieldset,#noteForm fieldset,#profileForm fieldset{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+  }
+  #feedForm label,#stoolForm label,#weightForm label,#noteForm label,#profileForm label{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+  }
+  #feedForm input[type="datetime-local"],
+  #stoolForm input[type="datetime-local"],
+  #weightForm input[type="date"],
+  #noteForm input[type="date"],
+  #profileForm input[type="date"]{
+    -webkit-appearance:none!important;
+    appearance:none!important;
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    inline-size:100%!important;
+    block-size:48px!important;
+    padding:0 8px!important;
+    font-size:14px!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+  #feedForm input[type="datetime-local"]::-webkit-date-and-time-value,
+  #stoolForm input[type="datetime-local"]::-webkit-date-and-time-value,
+  #weightForm input[type="date"]::-webkit-date-and-time-value,
+  #noteForm input[type="date"]::-webkit-date-and-time-value,
+  #profileForm input[type="date"]::-webkit-date-and-time-value{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    text-align:left!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+  }
+  #feedForm input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  #stoolForm input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  #weightForm input[type="date"]::-webkit-calendar-picker-indicator,
+  #noteForm input[type="date"]::-webkit-calendar-picker-indicator,
+  #profileForm input[type="date"]::-webkit-calendar-picker-indicator{
+    margin:0!important;
+    padding:2px!important;
+    flex:0 0 18px!important;
+  }
+}
+
 </style>
 </head>
 <body>
